@@ -245,4 +245,4 @@ MIT License
 
 ---
 
-If you are interested in collaborating, extending, or stress-testing HiveMind, open an issue or reach out.
+If you are interested in collaborating, extending, or stress-testing HiveMind, open an issue or reach out to Darsh Garg (darsh.garg@gmail.com)
