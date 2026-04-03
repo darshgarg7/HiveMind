@@ -9,8 +9,9 @@ from graph import build_graph
 
 def main():
     task_description = (
-        "A mid-sized company is considering migrating from on-prem infra to the cloud "
-        "under cost pressure and regulatory uncertainty."
+        "INCIDENT REPORT: An anomalous spike in outbound SSH traffic directed to an unknown IP "
+        "was detected originating from a restricted production database server. Initial "
+        "triage shows a service account with potentially compromised credentials was utilized."
     )
     
     print(f"Starting HiveMind MVP Run.")
