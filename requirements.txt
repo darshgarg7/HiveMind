@@ -3,3 +3,4 @@ langchain-openai
 langgraph
 pydantic
 python-dotenv
+streamlit
