@@ -1,0 +1,114 @@
+{
+  "run_id": "run-20260403-163314",
+  "task_description": "A mid-sized company is considering migrating from on-prem infra to the cloud under cost pressure and regulatory uncertainty.",
+  "memos": [
+    {
+      "perspective": "Cost-Focused",
+      "assumptions": [
+        "Cloud migration can result in lower upfront capital expenditures compared to on-prem infrastructure.",
+        "Long-term operational costs may fluctuate based on usage and vendor pricing.",
+        "Regulatory uncertainty may affect compliance requirements and costs.",
+        "Current on-prem infrastructure is nearing end-of-life or requires substantial upgrades."
+      ],
+      "strategy": "Recommend a phased migration to the cloud, prioritizing cost-sensitive and non-regulated workloads first. Negotiate short-term contracts with cloud vendors to minimize lock-in. Retain on-prem infrastructure for regulated workloads until regulatory clarity is achieved. Leverage cloud cost management tools and reserved instances for predictable workloads to maximize savings. Conduct regular audits of cloud usage to eliminate waste and optimize resource allocation.",
+      "risks": [
+        "Potential costs associated with data transfer and application refactoring.",
+        "Unexpected increases in cloud vendor pricing (e.g., egress fees, storage costs).",
+        "Regulatory changes may require expensive retrofits or data repatriation.",
+        "Partial migration may increase complexity and operational costs in the short term."
+      ],
+      "second_order_effects": [
+        "Improved cost visibility and potential for future cost optimization via cloud-native scaling.",
+        "Ability to rapidly adjust infrastructure footprint based on business needs, reducing over-provisioning costs.",
+        "Greater negotiating power with vendors due to phased approach and avoidance of full lock-in.",
+        "Potential for increased reliance on cloud, risking higher long-term costs if not closely managed."
+      ]
+    },
+    {
+      "perspective": "Risk-Focused",
+      "assumptions": [
+        "The company operates in a regulated industry with ambiguous or evolving compliance requirements.",
+        "Current on-prem infrastructure is stable and compliant but may be more expensive.",
+        "Cloud migration may offer cost savings but introduces new risks, including data residency, security, and compliance gaps.",
+        "The regulatory landscape may change, increasing scrutiny or introducing new obligations."
+      ],
+      "strategy": "Adopt a phased, hybrid approach to migration, prioritizing critical systems with known compliance requirements to remain on-premise while evaluating cloud solutions for non-critical workloads. Establish a cross-functional risk assessment team to continuously evaluate regulatory changes, cloud provider compliance certifications, and data security measures. Engage legal and compliance experts before each migration phase. Document all decisions and ensure rigorous vendor due diligence. Delay full migration until regulatory clarity is achieved.",
+      "risks": [
+        "Regulatory compliance gaps if cloud solutions do not match on-prem controls.",
+        "Potential data breaches due to new attack surfaces in the cloud.",
+        "Vendor lock-in or lack of contractual clarity regarding compliance responsibilities.",
+        "Operational disruption during phased migration."
+      ],
+      "second_order_effects": [
+        "May slow down cost savings realization, leading to prolonged higher expenditures.",
+        "Improved organizational awareness of compliance and risk management processes.",
+        "Potential for increased negotiation leverage with cloud providers on compliance and data residency.",
+        "Maintaining hybrid infrastructure may increase short-term complexity and require additional staffing or expertise."
+      ]
+    },
+    {
+      "perspective": "Speed-Focused",
+      "assumptions": [
+        "Rapid migration is prioritized over cost optimization or long-term maintainability.",
+        "Technical debt and higher operational expenses are acceptable in the short term for faster execution.",
+        "Regulatory requirements may change but are not immediate blockers if mitigations (e.g., region selection, basic compliance tools) are included.",
+        "Cloud provider selection can be based on ease of migration and available automation tooling rather than lowest cost."
+      ],
+      "strategy": "Adopt a 'Lift-and-Shift' migration approach to move workloads quickly from on-premises to the cloud, leveraging automation tools (e.g., AWS Application Migration Service, Azure Migrate, or Google Migrate for Compute Engine). Prioritize workloads with the least regulatory complexity and highest business impact. Use managed services where possible to reduce setup time. Defer optimization, refactoring, and advanced compliance implementations to post-migration phases. Form a cross-functional strike team empowered to make rapid decisions and maintain daily progress tracking.",
+      "risks": [
+        "Higher cloud costs due to lack of initial optimization (unused resources, overprovisioning).",
+        "Potential accumulation of technical debt, making future changes or optimizations more complex and expensive.",
+        "Incomplete or insufficient compliance measures could require rework if regulations change or are enforced more strictly.",
+        "Possible service disruptions due to rapid migration and limited testing."
+      ],
+      "second_order_effects": [
+        "Faster realization of cloud benefits (scalability, agility) enables quicker responses to business needs or market changes.",
+        "Potential for increased pressure on IT and compliance teams post-migration to address deferred issues.",
+        "The company may become locked into specific cloud vendor tooling or architectures, making future migrations slower or more costly.",
+        "Improved speed may set a new organizational expectation for rapid execution, influencing future project approaches."
+      ]
+    }
+  ],
+  "ranked_strategies": [
+    {
+      "evaluations": [
+        {
+          "perspective": "Cost-Focused",
+          "score": {
+            "relevance": 0.95,
+            "reasoning": 0.9,
+            "constraint_satisfaction": 0.95,
+            "overall_score": 0.93
+          },
+          "feedback": "Strongly addresses cost pressures with a pragmatic phased approach, balancing short-term savings and long-term flexibility. Effectively considers regulatory uncertainty by retaining regulated workloads on-prem. Risks and second-order effects are well articulated. Could further detail how to manage operational complexity during partial migration."
+        },
+        {
+          "perspective": "Risk-Focused",
+          "score": {
+            "relevance": 0.9,
+            "reasoning": 0.95,
+            "constraint_satisfaction": 0.98,
+            "overall_score": 0.94
+          },
+          "feedback": "Excellent focus on regulatory uncertainty and compliance, with robust risk management and governance processes. The strategy is highly relevant for regulated industries and provides clear mechanisms for ongoing risk assessment. Slightly less emphasis on cost optimization, but strong on constraint satisfaction and reasoning."
+        },
+        {
+          "perspective": "Speed-Focused",
+          "score": {
+            "relevance": 0.8,
+            "reasoning": 0.75,
+            "constraint_satisfaction": 0.7,
+            "overall_score": 0.75
+          },
+          "feedback": "Prioritizes speed, which may be attractive for business agility, but risks are high due to deferred compliance and optimization. Reasoning is less robust regarding regulatory uncertainty and cost management. Suitable for less regulated environments, but not ideal given the company's context."
+        }
+      ],
+      "ranked_perspectives": [
+        "Risk-Focused",
+        "Cost-Focused",
+        "Speed-Focused"
+      ],
+      "final_recommendation": "The best approach is a hybrid of the Risk-Focused and Cost-Focused strategies: adopt a phased migration, keeping regulated workloads on-premise until regulatory clarity is achieved, while migrating cost-sensitive, non-regulated workloads to the cloud. Establish a cross-functional risk assessment team to monitor compliance and regulatory changes, and leverage cloud cost management tools to optimize expenses. Negotiate flexible contracts with cloud vendors to avoid lock-in and conduct regular audits to ensure both cost and compliance objectives are met. Avoid rapid, lift-and-shift migrations unless regulatory and cost risks are minimal."
+    }
+  ]
+}
