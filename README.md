@@ -207,6 +207,16 @@ Anywhere the problem space is too large to reason about linearly, HiveMind fits.
 
 ---
 
+## How to Run
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+streamlit run main.py
+```
+
 ## Design Philosophy
 
 HiveMind is built around a few core beliefs:
