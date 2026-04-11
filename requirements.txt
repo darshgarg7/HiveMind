@@ -1,6 +1,14 @@
 langchain-core
 langchain-openai
+langchain
 langgraph
 pydantic
 python-dotenv
 streamlit
+dowhy
+pandas
+numpy
+networkx
+streamlit-agraph
+scipy
+scikit-learn

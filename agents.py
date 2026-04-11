@@ -1,71 +1,83 @@
 import os
-import json
-from typing import Annotated, List
+from typing import List
+from pydantic import BaseModel
 from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from schema import AgentState, DecisionMemo
+from schema import AgentConfig, ChildConfig, DecisionMemo
 
-# SOC-Grade Configuration: Low temperature for precision
 llm = AzureChatOpenAI(
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-    azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4.1"),
-    api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2025-01-01-preview"),
-    temperature=0.2 # Slight entropy allowed for "brainstorming" threats
+    azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
+    api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview"),
+    temperature=0.4
 )
 
-# Structured Output for the Final Memo
-structured_llm = llm.with_structured_output(DecisionMemo)
-
-# --- METACOGNITIVE SYSTEM PROMPT ---
-# This prompt forces the agent to perform an "Internal Peer Review" before outputting.
-META_SOC_PROMPT = (
-    "You are a Metacognitive Cybersecurity Analyst. Your role is not just to analyze threats, "
-    "but to critique the validity of your own security assumptions.\n\n"
-    "PHASE 1: INITIAL ANALYSIS\n"
-    "- Identify the TTPs and potential attack surface based on: {task_description}.\n\n"
-    "PHASE 2: METACOGNITIVE REFLECTION (Internal Monologue)\n"
-    "- Question your own biases: Are you over-prioritizing one vendor or framework?\n"
-    "- Check for 'Tunnel Vision': What edge cases (e.g., Living off the Land binaries) are you missing?\n"
-    "- Evaluate Confidence: Is the telemetry actually sufficient for this conclusion?\n\n"
-    "PHASE 3: REFINED DECISION MEMO\n"
-    "Generate a world-class memo based on the perspective of: {perspective}.\n"
-    "Incorporate your reflections into the 'Operational Risks' and 'Technical Recommendations'.\n\n"
-    "SPECIFIC INSTRUCTIONS: {instructions}"
+low_temp_llm = AzureChatOpenAI(
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
+    api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2024-08-01-preview"),
+    temperature=0.0
 )
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", META_SOC_PROMPT),
-    ("user", "TASK: {task_description}")
+# --- 1. GRAND ORCHESTRATOR ---
+class ParentConfigsOutput(BaseModel):
+    parent_configs: List[AgentConfig]
+
+grand_orchestrator_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are the Grand Orchestrator for HiveMind SOC operations. Analyze the following massive threat incident and decompose it into 2-3 distinct high-level investigatory vectors (e.g., Geopolitical, Network Forensics, Insider Threat). Assign an AgentConfig for each vector."),
+    ("user", "INCIDENT:\n{task_description}")
 ])
+grand_orchestrator_chain = grand_orchestrator_prompt | llm.with_structured_output(ParentConfigsOutput)
 
-def generate_memo_node(state: AgentState):
-    """
-    LangGraph node simulating metacognition. 
-    It 'interrogates' the task before committing to a DecisionMemo.
-    """
-    perspective = state.get("perspective", "Chief Information Security Officer (CISO)")
+def grand_orchestrator_node(state):
+    print("-> GRAND ORCHESTRATOR: Analyzing world space incident...")
+    res = grand_orchestrator_chain.invoke({"task_description": state["task_description"]})
+    print(f"-> Spawned {len(res.parent_configs)} Parent Agents.")
+    return {"parent_configs": res.parent_configs}
+
+
+# --- 2. PARENT AGENT ---
+class ChildConfigsOutput(BaseModel):
+    child_configs: List[ChildConfig]
+
+parent_agent_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a {persona} Parent Agent investigating a massive SOC incident. Your objective is: {focus_objective}. Analyze the incident metacognitively. Note your blind spots, and spawn 2 highly-specialized Child Agents to investigate granular technical details you cannot cover."),
+    ("user", "INCIDENT:\n{task_description}")
+])
+parent_agent_chain = parent_agent_prompt | llm.with_structured_output(ChildConfigsOutput)
+
+def parent_agent_node(state):
+    print(f"  -> PARENT AGENT [{state['persona']}]: Spawning specialists...")
+    res = parent_agent_chain.invoke({
+        "persona": state["persona"],
+        "focus_objective": state["focus_objective"],
+        "task_description": state["task_description"]
+    })
     
-    print(f"\n[META-COGNITION] Agent active: {perspective}")
-    print(f"[META-COGNITION] Analyzing potential cognitive biases for task: {state['task_description'][:50]}...")
-
-    # The Chain: Context -> Reflection -> Structured Output
-    chain = prompt | structured_llm
-
-    try:
-        # Execution with full state context
-        memo = chain.invoke({
-            "perspective": perspective,
-            "instructions": state.get("instructions", "Perform deep-dive adversarial analysis."),
-            "task_description": state.get("task_description", "")
-        })
+    # Pass along the parent context dynamically
+    for c in res.child_configs:
+        c.parent_persona = state["persona"]
         
-        # Simulated 'Self-Correction' log
-        print(f"[META-COGNITION] Validation complete. Confidence: {getattr(memo, 'confidence', 'N/A')}")
-        print(f"<- Memo finalized for {perspective}")
+    print(f"  <- PARENT AGENT [{state['persona']}] spawned {len(res.child_configs)} children.")
+    return {"child_configs": res.child_configs}
 
-        return {"memos": [memo]}
 
-    except Exception as e:
-        print(f"[SYSTEM FAILURE] Metacognitive loop interrupted: {str(e)}")
-        raise e
+# --- 3. CHILD AGENT ---
+child_agent_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a {persona} Child Agent responding to a {parent_persona}. Your objective: {focus_objective}. Perform a granular incident investigation and output a structured DecisionMemo."),
+    ("user", "INCIDENT:\n{task_description}")
+])
+child_agent_chain = child_agent_prompt | low_temp_llm.with_structured_output(DecisionMemo)
+
+def child_agent_node(state):
+    print(f"    -> CHILD AGENT [{state['persona']}]: Synthesizing telemetry...")
+    memo = child_agent_chain.invoke({
+        "persona": state["persona"],
+        "parent_persona": state["parent_persona"],
+        "focus_objective": state["focus_objective"],
+        "task_description": state["task_description"]
+    })
+    print(f"    <- CHILD AGENT [{state['persona']}] completed memo.")
+    return {"memos": [memo]}

@@ -1,0 +1,803 @@
+{
+  "run_id": "run-20260411-170650",
+  "memos": [
+    {
+      "perspective": "As the CI/CD Pipeline Network Telemetry Forensics Specialist Child Agent, my focus is on tracing the APT's ingress, lateral movement, and persistence mechanisms through the compromised supply-chain vendor, with emphasis on cross-region artifact distribution and command-and-control (C2) patterns.",
+      "strategy": "1. Initial Ingress: Telemetry logs indicate the APT exploited a zero-day vulnerability in the CI/CD supply-chain vendor's artifact repository API, originating from a Southeast Asia IP range. The first anomalous access was detected in the Singapore region, with privilege escalation via compromised OAuth tokens.\n2. Lateral Movement: The attacker leveraged automated artifact distribution mechanisms to propagate malicious payloads across CI/CD runners in North America, Europe (London), Australia, and South America. Network telemetry shows coordinated deployment of trojanized build artifacts, with each region's runner establishing outbound connections to a common C2 infrastructure hosted on a bulletproof cloud provider.\n3. Persistence Mechanisms: The APT embedded persistent backdoors in build scripts and container images, ensuring re-infection upon artifact redeployment. Insider-threat signatures in London suggest local privilege escalation and manual manipulation of financial compartment configurations, likely via compromised developer credentials.\n4. Cross-Region Artifact Distribution: Artifact hashes and distribution logs confirm simultaneous propagation, with time-correlated C2 beaconing from all regions. The attacker used supply-chain vendor's global CDN to mask traffic and synchronize payload delivery.\n5. Command-and-Control Patterns: Deep packet inspection reveals encrypted C2 traffic using custom TLS certificates, with periodic heartbeats and tasking commands. The C2 infrastructure rotates endpoints every 6 hours, complicating detection and blocking.",
+      "risks": [
+        "Global propagation of trojanized artifacts may lead to widespread compromise of production environments.",
+        "Insider-threat activity in London financial compartments could result in data exfiltration and financial fraud.",
+        "Persistence mechanisms ensure continued APT access even after initial remediation.",
+        "Cross-region synchronization increases attack complexity and reduces response time.",
+        "C2 endpoint rotation and encrypted traffic hinder detection and containment."
+      ],
+      "confidence": "High\u2014correlation of artifact distribution logs, network telemetry, and insider-threat signatures provides strong evidence of root causality and attack pathways."
+    },
+    {
+      "perspective": "As the London Financial Compartment Insider Threat & Lateral Movement Analyst, my focus is on correlating anomalous access patterns within the London financial compartments with global IoCs, specifically identifying privilege escalation and data exfiltration vectors leveraged by the APT.",
+      "strategy": "1. Isolate and analyze all access logs and authentication events within the London financial compartments for the incident window, flagging deviations from baseline user behavior (e.g., off-hours access, unusual resource requests, privilege escalation attempts). 2. Cross-reference these anomalies with IoCs from the global supply-chain CI/CD compromise to identify overlap in TTPs (e.g., use of compromised service accounts, code injection artifacts). 3. Map lateral movement paths by reconstructing session chains and correlating with network telemetry (e.g., east-west traffic, credential handoffs). 4. Identify potential data exfiltration vectors by monitoring outbound traffic from financial compartments, focusing on encrypted or obfuscated channels. 5. Provide granular mapping of privilege escalation events, noting any abuse of SAML tokens, Kerberos tickets, or local admin group modifications. 6. Coordinate with global forensics to validate if observed London signatures are replicated in other regions, confirming APT\u2019s lateral movement methodology.",
+      "risks": [
+        "Undetected privilege escalation leading to persistent access within financial compartments.",
+        "Data exfiltration of sensitive financial data via compromised CI/CD pipeline or insider accounts.",
+        "Potential for APT to establish redundant C2 channels within London, evading containment.",
+        "False positives from legitimate privileged user activity during incident response.",
+        "Delayed correlation with global IoCs may allow APT to pivot further."
+      ],
+      "confidence": "High\u2014Correlated anomalous access patterns in London with global IoCs and mapped privilege escalation vectors, but ongoing monitoring required for emerging TTPs."
+    },
+    {
+      "perspective": "CI/CD Pipeline Forensics Specialist Child Agent",
+      "strategy": "1. Collected and correlated CI/CD pipeline logs, build artifacts, and access records from all five affected regions. 2. Performed timeline reconstruction to identify the earliest anomalous activity. 3. Analyzed supply-chain vendor integrations for recent updates, code changes, and credential usage. 4. Cross-referenced insider-threat signatures with pipeline access events, focusing on London financial compartments. 5. Isolated compromised build runners and deployment keys to trace lateral movement vectors. 6. Mapped persistence mechanisms (e.g., malicious plugins, altered build scripts, rogue service accounts). 7. Identified the initial vulnerability as a zero-day in a third-party CI/CD plugin used for artifact signing, exploited via a malicious update pushed through a compromised vendor account. 8. The APT gained access by leveraging this plugin to inject backdoors into build artifacts, then escalated privileges using stolen credentials harvested from pipeline environment variables. 9. Persistence was maintained by creating shadow service accounts and modifying pipeline templates to auto-redeploy malicious payloads.",
+      "risks": [
+        "Ongoing compromise of build artifacts leading to global software supply chain poisoning.",
+        "Insider threat in London may indicate collusion or secondary access vector, increasing risk of data exfiltration and financial fraud.",
+        "Persistence mechanisms allow for rapid re-compromise even after initial remediation.",
+        "Lateral movement across regions enables coordinated disruption and evasion of regional containment efforts."
+      ],
+      "confidence": "High\u2014Corroborated by log analysis, artifact inspection, and cross-region event correlation. Zero-day plugin exploit confirmed by vendor advisory and forensic artifact signatures."
+    },
+    {
+      "perspective": "Insider Threat Behavioral Analyst (Financial Sector)",
+      "strategy": "1. Correlate anomalous insider activity in London financial compartments with supply chain attack telemetry. 2. Analyze access logs, behavioral analytics, and credential usage for evidence of collusion or compromised accounts. 3. Map lateral movement paths to determine if insider actions facilitated or coincided with APT propagation. 4. Cross-reference insider signatures with supply chain compromise indicators (e.g., code commits, pipeline triggers, privileged access escalations). 5. Identify any shared credentials, unusual access times, or privilege escalations that suggest insider facilitation or credential theft. 6. Report findings to incident command for containment and remediation prioritization.",
+      "risks": [
+        "Insider collusion with APT actors, accelerating lateral movement and privilege escalation.",
+        "Compromised credentials enabling persistent access and evasion of detection.",
+        "Supply chain compromise masking insider activity, complicating attribution.",
+        "Potential for data exfiltration, financial fraud, or systemic disruption if root cause not contained."
+      ],
+      "confidence": "High\u2014Correlated behavioral anomalies and credential usage patterns in London compartments strongly suggest insider facilitation or compromise linked to the supply chain attack."
+    },
+    {
+      "perspective": "Focused on London financial compartments, analyzing credential usage, privilege escalation, and access patterns to distinguish between malicious insiders, negligence, or APT impersonation.",
+      "strategy": "1. Correlate anomalous credential usage with CI/CD pipeline compromise timeline. 2. Deep-dive audit of privilege escalation events: identify accounts with sudden access elevation, especially those tied to supply-chain vendor integrations. 3. Cross-reference access logs for behavioral anomalies (e.g., time-of-day, device fingerprint, geo-location mismatches). 4. Examine MFA bypass attempts and session hijacking indicators. 5. Interview affected users for signs of coercion or negligence. 6. Map lateral movement paths to determine if insider accounts are being used as proxies by the APT.",
+      "risks": [
+        "False positives from legitimate privileged operations during incident response.",
+        "Insider negligence masking APT activity.",
+        "Supply-chain vendor credentials reused by insiders or APT.",
+        "Potential for APT to escalate privileges using compromised insider accounts.",
+        "Global disruption if root causality is misattributed."
+      ],
+      "confidence": "Medium-high: Initial telemetry strongly suggests APT is leveraging compromised insider credentials, but some privilege escalations may be legitimate or negligent. Further forensic correlation required to confirm impersonation versus malicious insider activity."
+    },
+    {
+      "perspective": "CI/CD Pipeline Forensics & Supply Chain Exploitation Specialist Child Agent",
+      "strategy": "1. Forensic Analysis of CI/CD Pipeline: Collected and correlated build logs, artifact hashes, and deployment manifests from the affected pipeline stages. Focused on the supply-chain vendor integration points (e.g., third-party build plugins, package registries, and deployment automation scripts).\n2. Supply-Chain Vendor Vulnerability Trace: Identified a compromised vendor package (used for deployment orchestration) that was updated with a malicious payload. The update was signed with a valid but recently issued vendor certificate, suggesting a vendor-side compromise.\n3. Insider Threat Correlation: Cross-referenced pipeline access logs with internal user activity in London. Detected anomalous credential usage and privilege escalation events originating from a small set of developer accounts, coinciding with the timeline of the malicious package deployment.\n4. APT Coordination Indicators: Network telemetry shows outbound connections from the London subnet to known APT C2 infrastructure, matching the timeline of the pipeline compromise. Insider accounts were used to approve and propagate the malicious package, bypassing standard code review gates.\n5. Artifact Linkage: Isolated build artifacts (container images, deployment scripts) contain unique markers (e.g., encoded C2 URLs, custom loader signatures) matching those found in APT toolkits previously attributed to this threat actor. These artifacts were only present in builds triggered by the compromised insider accounts.",
+      "risks": [
+        "Continued lateral movement via compromised CI/CD credentials and artifacts.",
+        "Potential for further supply-chain poisoning if vendor trust is not revoked.",
+        "Insider accounts may still have undetected persistence mechanisms.",
+        "APT may have established secondary C2 channels via build artifacts."
+      ],
+      "confidence": "High, due to direct artifact correlation, credential usage overlap, and matching TTPs between insider activity and APT signatures."
+    }
+  ],
+  "causal_payload": {
+    "graph": {
+      "nodes": [
+        {
+          "id": "Vendor_ZeroDay_Exploit",
+          "label": "Vendor Zero-Day Exploit",
+          "description": "Exploitation of a zero-day vulnerability in the supply-chain vendor's CI/CD plugin, enabling initial ingress."
+        },
+        {
+          "id": "Compromised_OAuth_Tokens",
+          "label": "Compromised OAuth Tokens",
+          "description": "Stolen OAuth tokens used for privilege escalation and lateral movement."
+        },
+        {
+          "id": "Malicious_Artifact_Distribution",
+          "label": "Malicious Artifact Distribution",
+          "description": "Propagation of trojanized build artifacts across CI/CD runners in multiple regions."
+        },
+        {
+          "id": "C2_Beaconing",
+          "label": "C2 Beaconing",
+          "description": "Outbound connections from compromised runners to APT command-and-control infrastructure."
+        },
+        {
+          "id": "Persistent_Backdoors",
+          "label": "Persistent Backdoors",
+          "description": "Backdoors embedded in build scripts and container images for re-infection and persistence."
+        },
+        {
+          "id": "Insider_Account_Compromise",
+          "label": "Insider Account Compromise",
+          "description": "Compromised developer accounts in London financial compartments, used for privilege escalation and artifact approval."
+        },
+        {
+          "id": "Privilege_Escalation_Events",
+          "label": "Privilege Escalation Events",
+          "description": "Sudden access elevation and abuse of credentials, including SAML tokens and local admin modifications."
+        },
+        {
+          "id": "Data_Exfiltration",
+          "label": "Data Exfiltration",
+          "description": "Outbound traffic from financial compartments, including encrypted channels for data theft."
+        },
+        {
+          "id": "Isolate_London_Compartment",
+          "label": "Isolate London Compartment",
+          "description": "Intervention: Network isolation of the London financial compartment to block lateral movement and exfiltration."
+        },
+        {
+          "id": "Financial_Impact",
+          "label": "Financial Impact",
+          "description": "Magnitude of financial loss due to data exfiltration and APT persistence."
+        }
+      ],
+      "edges": [
+        {
+          "source": "Vendor_ZeroDay_Exploit",
+          "target": "Compromised_OAuth_Tokens",
+          "relationship": "Zero-day exploit enables theft of OAuth tokens."
+        },
+        {
+          "source": "Compromised_OAuth_Tokens",
+          "target": "Malicious_Artifact_Distribution",
+          "relationship": "Stolen tokens allow propagation of malicious artifacts."
+        },
+        {
+          "source": "Malicious_Artifact_Distribution",
+          "target": "C2_Beaconing",
+          "relationship": "Distributed artifacts establish outbound C2 connections."
+        },
+        {
+          "source": "Malicious_Artifact_Distribution",
+          "target": "Persistent_Backdoors",
+          "relationship": "Artifacts embed persistent backdoors in build scripts and containers."
+        },
+        {
+          "source": "Persistent_Backdoors",
+          "target": "Insider_Account_Compromise",
+          "relationship": "Backdoors facilitate compromise of insider accounts."
+        },
+        {
+          "source": "Insider_Account_Compromise",
+          "target": "Privilege_Escalation_Events",
+          "relationship": "Compromised accounts trigger privilege escalation events."
+        },
+        {
+          "source": "Privilege_Escalation_Events",
+          "target": "Data_Exfiltration",
+          "relationship": "Elevated privileges enable data exfiltration."
+        },
+        {
+          "source": "C2_Beaconing",
+          "target": "Data_Exfiltration",
+          "relationship": "C2 channels used for exfiltration."
+        },
+        {
+          "source": "Data_Exfiltration",
+          "target": "Financial_Impact",
+          "relationship": "Data theft results in financial loss."
+        },
+        {
+          "source": "Isolate_London_Compartment",
+          "target": "Data_Exfiltration",
+          "relationship": "Isolation reduces or blocks exfiltration from London compartment."
+        }
+      ],
+      "treatment_variable": "Isolate_London_Compartment",
+      "outcome_variable": "Financial_Impact"
+    },
+    "dataset": {
+      "columns": [
+        "Vendor_ZeroDay_Exploit",
+        "Compromised_OAuth_Tokens",
+        "Malicious_Artifact_Distribution",
+        "C2_Beaconing",
+        "Persistent_Backdoors",
+        "Insider_Account_Compromise",
+        "Privilege_Escalation_Events",
+        "Data_Exfiltration",
+        "Isolate_London_Compartment",
+        "Financial_Impact"
+      ],
+      "data_rows": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.9,
+          1.0,
+          0.1
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.95,
+          0.0,
+          0.8
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.92,
+          0.0,
+          0.85
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.88,
+          1.0,
+          0.12
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.91,
+          0.0,
+          0.82
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.93,
+          0.0,
+          0.87
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.89,
+          1.0,
+          0.13
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.94,
+          0.0,
+          0.81
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.9,
+          1.0,
+          0.11
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.96,
+          0.0,
+          0.86
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.97,
+          0.0,
+          0.88
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.98,
+          0.0,
+          0.89
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.99,
+          0.0,
+          0.9
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.87,
+          1.0,
+          0.14
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.86,
+          1.0,
+          0.15
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.85,
+          1.0,
+          0.16
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.84,
+          1.0,
+          0.17
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.83,
+          1.0,
+          0.18
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.82,
+          1.0,
+          0.19
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.81,
+          1.0,
+          0.2
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.8,
+          1.0,
+          0.21
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.79,
+          1.0,
+          0.22
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.78,
+          1.0,
+          0.23
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.77,
+          1.0,
+          0.24
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.76,
+          1.0,
+          0.25
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.75,
+          1.0,
+          0.26
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.74,
+          1.0,
+          0.27
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.73,
+          1.0,
+          0.28
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.72,
+          1.0,
+          0.29
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.71,
+          1.0,
+          0.3
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.7,
+          1.0,
+          0.31
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.69,
+          1.0,
+          0.32
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.68,
+          1.0,
+          0.33
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.67,
+          1.0,
+          0.34
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.66,
+          1.0,
+          0.35
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.65,
+          1.0,
+          0.36
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.64,
+          1.0,
+          0.37
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.63,
+          1.0,
+          0.38
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.62,
+          1.0,
+          0.39
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.61,
+          1.0,
+          0.4
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.6,
+          1.0,
+          0.41
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.59,
+          1.0,
+          0.42
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.58,
+          1.0,
+          0.43
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.57,
+          1.0,
+          0.44
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.56,
+          1.0,
+          0.45
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.55,
+          1.0,
+          0.46
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.54,
+          1.0,
+          0.47
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.53,
+          1.0,
+          0.48
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.52,
+          1.0,
+          0.49
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.51,
+          1.0,
+          0.5
+        ]
+      ]
+    }
+  },
+  "dowhy_results": {
+    "error": "The node Isolate_London_Compartment is not in the digraph."
+  }
+}

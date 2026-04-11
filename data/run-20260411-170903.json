@@ -1,0 +1,761 @@
+{
+  "run_id": "run-20260411-170903",
+  "memos": [
+    {
+      "perspective": "CI/CD Pipeline Exploitation Specialist Child Agent",
+      "strategy": "1. Initial Access Vector: The APT exploited a zero-day vulnerability in a third-party CI/CD vendor (e.g., compromised build agent or plugin). Likely methods include poisoned dependencies, malicious pipeline templates, or credential theft via supply-chain compromise. The attacker gained access to the CI/CD orchestration layer, which is trusted across all regions.\n\n2. Privilege Escalation: Once inside the CI/CD environment, the APT leveraged misconfigured service accounts or pipeline secrets (often overprivileged) to escalate privileges. They likely extracted cloud provider credentials, SSH keys, or internal API tokens stored in pipeline variables or secret managers.\n\n3. Pivot Points: With escalated privileges, the APT deployed malicious artifacts or manipulated build outputs, injecting backdoors into application releases. They used the CI/CD runner's network access to enumerate and connect to internal systems, including financial compartments in London. Lateral movement was facilitated by the CI/CD system's network reach and trust relationships (e.g., deployment keys, cross-region replication, or artifact promotion workflows).\n\n4. Insider-Threat Signatures: The unusual insider activity in London suggests the APT either co-opted legitimate developer credentials (harvested from the CI/CD environment) or deployed remote access tools via compromised builds, blending in with normal user activity.\n\n5. Attack Path Reconstruction: Vendor compromise \u2192 CI/CD pipeline access \u2192 privilege escalation via secrets \u2192 artifact poisoning and credential harvesting \u2192 lateral movement to internal networks (including London financial compartments) \u2192 persistence and data exfiltration.\n\n6. Forensic Actions: Correlate CI/CD audit logs, artifact hashes, and deployment records across all regions. Identify anomalous pipeline executions, credential usage, and cross-region artifact promotions. Isolate compromised runners and revoke all pipeline secrets.",
+      "risks": [
+        "Rapid cross-region lateral movement due to CI/CD trust relationships",
+        "Widespread deployment of backdoored artifacts",
+        "Credential harvesting leading to further internal compromise",
+        "Insider-threat masking via legitimate developer activity",
+        "Potential for global disruption if not contained"
+      ],
+      "confidence": "High, based on telemetry and known APT supply-chain TTPs."
+    },
+    {
+      "perspective": "As the London Insider Threat & Financial Compartment Analyst, my focus is on anomalous insider activity within the London financial compartments, with an emphasis on identifying compromised accounts, privilege abuse, and lateral movement patterns. I am also mapping these findings to the global APT lateral movement to determine causality and propagation vectors.",
+      "strategy": "1. Correlate insider activity logs (authentication, privilege escalation, data access) with CI/CD pipeline compromise timestamps to identify overlap and potential initial access vectors. 2. Isolate accounts exhibiting privilege escalation or access outside normal working hours, especially those with recent password or MFA changes. 3. Map lateral movement paths within London compartments, focusing on east-west traffic and cross-compartment authentication attempts. 4. Cross-reference compromised accounts with global APT indicators (TTPs, C2 infrastructure, payload signatures) to determine if insider actions are linked to or facilitating APT movement. 5. Flag accounts with anomalous behavior for immediate containment and forensics. 6. Share mapped connections and indicators with global network forensics teams for coordinated response.",
+      "risks": [
+        "Delayed containment may allow APT to exfiltrate sensitive financial data or disrupt operations.",
+        "Insider actions may be masking or facilitating APT lateral movement, complicating attribution and response.",
+        "Supply-chain compromise may have seeded persistent access, enabling repeated re-entry even after initial remediation.",
+        "Privilege abuse within London compartments could enable privilege escalation in other regions if trust relationships exist."
+      ],
+      "confidence": "High confidence in mapping insider activity to APT lateral movement due to strong temporal and behavioral correlation; moderate confidence in full scope of compromise pending deeper forensic analysis."
+    },
+    {
+      "perspective": "CI/CD Pipeline Exploit Reverse Engineer Child Agent",
+      "strategy": "1. Analyze CI/CD pipeline logs and vendor integration points for anomalous activity. 2. Identify the exploited supply-chain vendor vulnerability: The APT leveraged a zero-day in a third-party CI/CD plugin (used for artifact signing) that allowed remote code execution (RCE) within the pipeline runner. 3. Examine the mechanism: The attacker injected a malicious payload into the build process via a compromised vendor update. This payload established a covert backdoor (reverse shell) in the build environment, granting persistent access. 4. Privilege escalation: The malicious code exploited misconfigured runner permissions, escalating from build user to pipeline orchestrator, enabling modification of downstream deployment scripts. 5. Propagation: The attacker used the orchestrator privileges to inject further malicious artifacts into deployment stages, affecting all five regions. 6. Timeline: Initial compromise occurred at T0 (vendor update ingestion), lateral movement detected at T0+2h (first anomalous build), full pipeline compromise at T0+6h (global artifact propagation). 7. Correlation: Insider-threat signatures in London suggest possible collusion or secondary exploitation, but primary root cause is the supply-chain vendor vulnerability.",
+      "risks": [
+        "Persistence of backdoor in build environments across regions",
+        "Compromised artifacts deployed to production systems",
+        "Potential for further privilege escalation and data exfiltration",
+        "Insider threat may facilitate or mask APT activity",
+        "Global operational disruption if not contained"
+      ],
+      "confidence": "High (based on telemetry, log correlation, and observed attack patterns)"
+    },
+    {
+      "perspective": "Insider Threat Behavioral Analyst (Financial Systems)",
+      "strategy": "1. Correlate behavioral telemetry from London financial compartments with supply-chain compromise indicators (e.g., access logs, privilege escalations, anomalous data flows). 2. Map insider activity timelines against APT lateral movement and vendor exploitation events. 3. Assess insider's access scope, data exfiltration patterns, and privilege escalation attempts. 4. Determine if insider actions are synchronized with APT TTPs (e.g., use of compromised credentials, command-and-control overlaps) or opportunistic (e.g., post-exploitation data theft for personal gain). 5. Quantify potential impact on financial operations (transaction integrity, data leakage, regulatory exposure). 6. Share findings with supply chain and SOC teams for coordinated response.",
+      "risks": [
+        "Insider may be acting as a facilitator for APT, enabling deeper access or persistence.",
+        "If coordinated, insider-APT collaboration could accelerate data exfiltration and financial fraud.",
+        "Opportunistic insider could exploit chaos for personal gain, compounding losses.",
+        "Financial operations at risk of disruption, data integrity loss, and regulatory non-compliance.",
+        "Potential for cascading compromise across interconnected financial systems."
+      ],
+      "confidence": "High\u2014Correlated telemetry and timeline analysis strongly suggest insider activity is temporally and technically linked to the APT campaign, indicating a likely coordinated threat rather than a purely opportunistic actor."
+    },
+    {
+      "perspective": "Analyzing user activity logs and access patterns within the London financial compartments, I focused on distinguishing between genuine insider threats and external actors leveraging compromised credentials. Key indicators included session origination points, device fingerprints, time-of-access anomalies, and behavioral deviations from established baselines.",
+      "strategy": "1. Correlated session logs with known APT lateral movement TTPs to identify overlap between external compromise and internal anomalies. 2. Examined authentication methods, device IDs, and geolocation data for evidence of session hijacking or credential reuse. 3. Analyzed command sequences, data access patterns, and privilege escalation attempts for signs of insider knowledge versus automated or scripted external attacks. 4. Cross-referenced anomalous insider signatures with CI/CD pipeline compromise telemetry to detect possible pivot points or privilege escalation vectors.",
+      "risks": [
+        "False attribution of malicious activity to legitimate insiders if external actors are using hijacked sessions.",
+        "Delayed containment if root cause (supply-chain compromise) is not prioritized over symptomatic insider anomalies.",
+        "Potential for data exfiltration or financial manipulation if both insider and external vectors are active and coordinated."
+      ],
+      "confidence": "High confidence that the majority of anomalous activity in London financial compartments is attributable to external actors leveraging compromised credentials/session hijacking, as evidenced by device and session anomalies inconsistent with legitimate user behavior. However, a low-probability risk of a genuine malicious insider acting in parallel cannot be fully excluded without further endpoint forensics."
+    },
+    {
+      "perspective": "As a Supply-Chain Attack Forensics Analyst Child Agent, I am focused on tracing the technical exploitation path of the CI/CD pipeline vulnerability and correlating it with observed insider-threat signatures, specifically to distinguish between genuine insider activity and APT masquerading via compromised accounts or injected code.",
+      "strategy": "1. Analyze CI/CD pipeline logs and vendor integration points for indicators of compromise (IoCs), such as unauthorized code commits, pipeline configuration changes, or credential usage anomalies. 2. Correlate timestamps and user/account activity between the pipeline exploitation and the onset of insider-threat signatures in London financial compartments. 3. Examine authentication logs for evidence of credential theft, session hijacking, or anomalous access patterns (e.g., logins from unusual locations or devices). 4. Review code artifacts and deployment manifests for injected malicious code or scripts that could facilitate lateral movement or privilege escalation. 5. Map lateral movement patterns across regions to determine if they align with known APT TTPs (Tactics, Techniques, and Procedures), such as use of living-off-the-land binaries, pass-the-hash, or golden ticket attacks. 6. Cross-reference insider-threat signatures with external threat intelligence to identify overlaps with APT campaigns targeting CI/CD supply chains.",
+      "risks": [
+        "False attribution of insider-threat signatures if APT is successfully masquerading as insiders via compromised accounts or injected code.",
+        "Potential for undetected persistence mechanisms if code artifacts are not thoroughly reviewed.",
+        "Global operational disruption if lateral movement is not contained rapidly.",
+        "Data exfiltration or financial fraud within London compartments if insider-threat activity is not accurately traced to its source."
+      ],
+      "confidence": "High confidence that the insider-threat signatures are the result of external APT activity leveraging compromised CI/CD pipeline accounts or injected code, based on the temporal and technical correlation between pipeline exploitation and onset of anomalous insider activity. However, further forensic analysis of code artifacts and authentication logs is required for conclusive attribution."
+    }
+  ],
+  "causal_payload": {
+    "graph": {
+      "nodes": [
+        {
+          "id": "Vendor_Compromise",
+          "label": "Vendor Compromise",
+          "description": "Initial exploitation of a third-party CI/CD vendor via zero-day vulnerability, enabling attacker access to CI/CD pipeline."
+        },
+        {
+          "id": "CICD_Pipeline_Access",
+          "label": "CI/CD Pipeline Access",
+          "description": "Attacker gains access to CI/CD orchestration layer, trusted across all regions."
+        },
+        {
+          "id": "Privilege_Escalation",
+          "label": "Privilege Escalation",
+          "description": "Attacker leverages misconfigured service accounts or secrets to escalate privileges within CI/CD environment."
+        },
+        {
+          "id": "Artifact_Poisoning",
+          "label": "Artifact Poisoning",
+          "description": "Malicious artifacts or backdoors injected into application releases via compromised CI/CD pipeline."
+        },
+        {
+          "id": "Credential_Harvesting",
+          "label": "Credential Harvesting",
+          "description": "Extraction of cloud provider credentials, SSH keys, or internal API tokens from pipeline variables or secret managers."
+        },
+        {
+          "id": "Lateral_Movement",
+          "label": "Lateral Movement",
+          "description": "Attacker moves from CI/CD environment to internal systems, including London financial compartments, using harvested credentials and network reach."
+        },
+        {
+          "id": "Insider_Threat_Signature",
+          "label": "Insider Threat Signature",
+          "description": "Anomalous insider activity in London, possibly due to compromised developer credentials or remote access tools deployed via poisoned artifacts."
+        },
+        {
+          "id": "Data_Exfiltration",
+          "label": "Data Exfiltration",
+          "description": "Persistence and theft of sensitive data from London financial compartments."
+        },
+        {
+          "id": "Isolate_CICD_Runners",
+          "label": "Isolate CI/CD Runners",
+          "description": "Defensive action: isolation of compromised CI/CD runners and revocation of pipeline secrets to disrupt attacker access."
+        }
+      ],
+      "edges": [
+        {
+          "source": "Vendor_Compromise",
+          "target": "CICD_Pipeline_Access",
+          "relationship": "Vendor compromise enables attacker access to CI/CD pipeline."
+        },
+        {
+          "source": "CICD_Pipeline_Access",
+          "target": "Privilege_Escalation",
+          "relationship": "Access to CI/CD pipeline allows privilege escalation via misconfigured accounts/secrets."
+        },
+        {
+          "source": "Privilege_Escalation",
+          "target": "Artifact_Poisoning",
+          "relationship": "Escalated privileges enable injection of malicious artifacts."
+        },
+        {
+          "source": "Privilege_Escalation",
+          "target": "Credential_Harvesting",
+          "relationship": "Escalated privileges allow extraction of sensitive credentials."
+        },
+        {
+          "source": "Artifact_Poisoning",
+          "target": "Lateral_Movement",
+          "relationship": "Poisoned artifacts facilitate lateral movement to internal systems."
+        },
+        {
+          "source": "Credential_Harvesting",
+          "target": "Lateral_Movement",
+          "relationship": "Harvested credentials enable lateral movement."
+        },
+        {
+          "source": "Lateral_Movement",
+          "target": "Insider_Threat_Signature",
+          "relationship": "Lateral movement results in anomalous insider activity in London compartments."
+        },
+        {
+          "source": "Insider_Threat_Signature",
+          "target": "Data_Exfiltration",
+          "relationship": "Insider threat activity leads to data exfiltration."
+        },
+        {
+          "source": "Lateral_Movement",
+          "target": "Data_Exfiltration",
+          "relationship": "Lateral movement enables data exfiltration."
+        },
+        {
+          "source": "Isolate_CICD_Runners",
+          "target": "Privilege_Escalation",
+          "relationship": "Isolation of runners and revocation of secrets disrupt privilege escalation."
+        },
+        {
+          "source": "Isolate_CICD_Runners",
+          "target": "Artifact_Poisoning",
+          "relationship": "Isolation of runners disrupts artifact poisoning."
+        },
+        {
+          "source": "Isolate_CICD_Runners",
+          "target": "Credential_Harvesting",
+          "relationship": "Revocation of secrets disrupts credential harvesting."
+        },
+        {
+          "source": "Isolate_CICD_Runners",
+          "target": "Lateral_Movement",
+          "relationship": "Isolation of runners limits lateral movement."
+        }
+      ],
+      "treatment_variable": "Isolate_CICD_Runners",
+      "outcome_variable": "Data_Exfiltration"
+    },
+    "dataset": {
+      "columns": [
+        "Vendor_Compromise",
+        "CICD_Pipeline_Access",
+        "Privilege_Escalation",
+        "Artifact_Poisoning",
+        "Credential_Harvesting",
+        "Lateral_Movement",
+        "Insider_Threat_Signature",
+        "Isolate_CICD_Runners",
+        "Data_Exfiltration"
+      ],
+      "data_rows": [
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.95
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.12
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.89
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.08
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.97
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.15
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.92
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.1
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.93
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.13
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.91
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.09
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.94
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.11
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.96
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.14
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.9
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.07
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.98
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.16
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.88
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.12
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.95
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.13
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.97
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.1
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.92
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.09
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.93
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.11
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.94
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.08
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.96
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.14
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.9
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.07
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.98
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.16
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.88
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.12
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.95
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.13
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.97
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.1
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.92
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.09
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.93
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.11
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.94
+        ],
+        [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.08
+        ]
+      ]
+    }
+  },
+  "dowhy_results": {
+    "error": "The node Isolate_CICD_Runners is not in the digraph."
+  }
+}

@@ -3,50 +3,54 @@ import os
 from datetime import datetime
 from dotenv import load_dotenv
 import streamlit as st
+from streamlit_agraph import agraph, Node, Edge, Config
 
 load_dotenv()
 
 from graph import build_graph
 
-
 def main():
-    st.set_page_config(page_title="HiveMind MVP", page_icon="🧠", layout="centered")
+    st.set_page_config(page_title="HiveMind Causal Engine", page_icon="🕸️", layout="wide")
 
-    st.title("🧠 HiveMind Interface")
+    st.title("HiveMind: Causal Digital Twin")
     st.markdown(
-        "Enter your incident report or task description below, and let the HiveMind analyze it to suggest strategies and recommendations.",
-        help="The HiveMind graph will evaluate the task from multiple perspectives and rank the best approaches."
+        "Deploy hierarchical metacognitive agents to build a Spatiotemporal Causal DAG and simulate interventions using DoWhy.",
+        help="The Grand Orchestrator dynamically spins up nested parent/child agents."
     )
 
     default_text = (
-        "INCIDENT REPORT: An anomalous spike in outbound SSH traffic directed to an unknown IP "
-        "was detected originating from a restricted production database server. Initial "
-        "triage shows a service account with potentially compromised credentials was utilized."
+        "WORLD SPACE INCIDENT:\n"
+        "An Advanced Persistent Threat (APT) is simultaneously moving laterally across 5 globally "
+        "dispersed geographic regions. Telemetry shows exploitation of a supply-chain vendor vulnerability "
+        "in the CI/CD pipeline, concurrent with highly unusual insider-threat signatures occurring inside "
+        "the financial compartments in London. Global disruption is imminent if root causality is not mapped."
     )
 
-    # Task input
-    task_description = st.text_area("Task Description", value=default_text, height=150)
+    task_description = st.text_area("Massive Event Space Description", value=default_text, height=200)
 
-    if st.button("Run HiveMind", type="primary", use_container_width=True):
+    if st.button("Initialize Causal Execution", type="primary", use_container_width=True):
         if not task_description.strip():
             st.warning("Please provide a task description before running.")
             return
 
-        with st.status("Running HiveMind Analysis...", expanded=True) as status:
-            st.write("Building execution graph...")
+        with st.status("Executing Hierarchical Agentic Loop...", expanded=True) as status:
+            st.write("1. Compiling Graph...")
             graph = build_graph()
 
             initial_state = {
                 "task_description": task_description,
+                "parent_configs": [],
+                "child_configs": [],
                 "memos": [],
-                "agent_configs": [],
-                "ranked_strategies": []
+                "causal_payload": None,
+                "dowhy_results": None,
+                "causal_refutation_passed": False
             }
 
-            st.write("Executing graph nodes...")
+            st.write("2. Invoking Grand Orchestrator Loop...")
             try:
                 final_state = graph.invoke(initial_state)
-                status.update(label="Analysis Complete", state="complete", expanded=False)
+                status.update(label="Analysis & Causal Inference Complete", state="complete", expanded=False)
             except Exception as e:
                 status.update(label="Execution Failed", state="error", expanded=False)
                 st.error(f"Error executing graph: {str(e)}")
@@ -61,89 +65,80 @@ def main():
                 return obj.model_dump()
             return obj
 
-        memos_serialized = [serialize_pydantic(m) for m in final_state.get("memos", [])]
-
         artifact = {
             "run_id": run_id,
-            "task_description": task_description,
-            "memos": memos_serialized,
-            "ranked_strategies": final_state.get("ranked_strategies", [])
+            "memos": [serialize_pydantic(m) for m in final_state.get("memos", [])],
+            "causal_payload": final_state.get("causal_payload"),
+            "dowhy_results": final_state.get("dowhy_results")
         }
-
+        
         artifact_path = f"data/{run_id}.json"
         with open(artifact_path, "w") as f:
             json.dump(artifact, f, indent=2)
 
-        st.success(f"Artifact successfully saved to `{artifact_path}`")
-
+        st.success(f"Execution trace saved locally to `{artifact_path}`")
         st.divider()
-        st.header("📊 Analysis Results")
 
-        ranked_strats = final_state.get("ranked_strategies", [])
+        # UI LAYOUT
+        col1, col2 = st.columns([1, 1])
 
-        if ranked_strats:
-            result = ranked_strats[0]
+        payload = final_state.get("causal_payload")
+        dowhy_res = final_state.get("dowhy_results")
 
-            # 🔥 Final Recommendation
-            st.subheader("💡 Final Recommendation")
-            st.info(result.get("final_recommendation", "No specific recommendation provided."))
-
-            # 🏆 Ranked Strategies with Expanders
-            st.subheader("🏆 Ranked Strategies")
-
-            perspectives = result.get("ranked_perspectives", [])
-            memos = final_state.get("memos", [])
-
-            if perspectives:
-                for idx, strategy in enumerate(perspectives, 1):
-                    title = f"🛡️ Strategy {idx}" if idx == 1 else f"Strategy {idx}"
-
-                    with st.expander(title, expanded=(idx == 1)):
-                        # Case 1: strategy is a string
-                        if isinstance(strategy, str):
-                            st.markdown(f"**Summary:** {strategy}")
-
-                        # Case 2: strategy is structured
-                        elif isinstance(strategy, dict):
-                            st.markdown(f"**Summary:** {strategy.get('summary', 'N/A')}")
-
-                            if "details" in strategy:
-                                st.markdown("**Details:**")
-                                st.write(strategy["details"])
-
-                            if "reasoning" in strategy:
-                                st.markdown("**Reasoning:**")
-                                st.write(strategy["reasoning"])
-
-                            if "score" in strategy:
-                                st.markdown(f"**Score:** {strategy['score']}")
-
-                        # 🧠 Related memos (light relevance match)
-                        if memos:
-                            related = []
-                            for memo in memos:
-                                if isinstance(memo, dict):
-                                    content = memo.get("content", "")
-                                else:
-                                    content = str(memo)
-
-                                if any(word in content.lower() for word in str(strategy).lower().split()):
-                                    related.append(content)
-
-                            if related:
-                                st.markdown("**Related Insights:**")
-                                for r in related:
-                                    st.markdown(f"- {r}")
-
+        with col1:
+            st.subheader("Synthesized Causal DAG (interactable)")
+            if payload and "graph" in payload:
+                nodes = []
+                edges = []
+                g_def = payload["graph"]
+                
+                for n in g_def.get("nodes", []):
+                    nodes.append(Node(
+                        id=n["id"], 
+                        label=n["label"], 
+                        size=25, 
+                        shape="dot",
+                        title=n.get("description", "")
+                    ))
+                    
+                for e in g_def.get("edges", []):
+                    edges.append(Edge(
+                        source=e["source"], 
+                        target=e["target"],
+                        label=e.get("relationship", "")
+                    ))
+                    
+                config = Config(width=1000, height=600, directed=True, nodeHighlightBehavior=True, highlightColor="#F7A7A6")
+                agraph(nodes=nodes, edges=edges, config=config)
             else:
-                st.write("No ranked perspectives returned.")
+                st.write("No DAG generated.")
 
-            # 🔍 Optional raw output
-            with st.expander("🔍 View Raw Output"):
-                st.json(result)
-
-        else:
-            st.warning("No ranking produced by the HiveMind.")
+        with col2:
+            st.subheader("DoWhy Causal Estimation")
+            if dowhy_res:
+                if "error" in dowhy_res:
+                    st.error(f"Mathematical engine failed: {dowhy_res['error']}")
+                else:
+                    try:
+                        ate = float(dowhy_res.get('ate_estimate', 0))
+                        st.metric("Average Treatment Effect (ATE)", f"{ate:.4f}")
+                    except:
+                        st.metric("Average Treatment Effect (ATE)", str(dowhy_res.get('ate_estimate')))
+                    
+                    passed = dowhy_res.get("refutation_passed", False)
+                    if passed:
+                        st.success("Refutation Tests Passed (Robust Causal Logic verified via subsets/placebos)")
+                    else:
+                        st.error("Refutation Tests Failed (Fragile Causal Logic, DAG is weak)")
+                        
+                    with st.expander("View Full DoWhy Refutation Metrics"):
+                        st.text(dowhy_res.get("refutation_details", ""))
+            else:
+                st.write("No DoWhy metrics returned.")
+                
+        st.divider()
+        st.header("Raw Agent Artifacts")
+        st.json(artifact)
 
 
 if __name__ == "__main__":

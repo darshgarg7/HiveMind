@@ -1,258 +1,105 @@
-# HiveMind
+# HiveMind: Causal Digital Twin Engine
 
-**A self-orchestrating, evolutionary multi-agent system for dynamic simulation and strategic insight generation.**
+**A self-orchestrating, evolutionary multi-agent system for spatiotemporal causal mapping and strategic threat modeling.**
 
-HiveMind is an AI system designed to explore complex possibility spaces by spawning, coordinating, and evolving networks of AI agents. Unlike traditional multi-agent systems with static roles, HiveMind agents can create other agents, share learned behaviors, and regulate their own growth based on expected information gain and resource constraints.
-
-At its core, HiveMind is about leverage: using structured autonomy to surface insights that would be difficult or impossible for a single model or human team to uncover.
+HiveMind has systematically evolved from a foundational multi-agent map-reduce concept into an advanced **Causal Digital Twin**. Using recursive architecture, it explores complex possibility spaces by spawning networks of AI agents. These agents analyze deeply dimensional threat vectors, which are then mathematically synthesized into Causal Directed Acyclic Graphs (DAGs) and structurally verified using rigorous computational math.
 
 ---
 
 ## Why HiveMind?
 
-Modern strategic problems, whether in business, policy, security, or systems design, are:
+Modern strategic problems—especially in cybersecurity, red-teaming, or system design—are:
+* **High-dimensional & Non-linear**: Hidden interactions obscure causality.
+* **Too intricate for exhaustive human reasoning**: Human analysts hit cognitive limits when spanning global supply chains and insider threats simultaneously.
 
-* High-dimensional
-* Non-linear
-* Full of hidden interactions
-* Too large for exhaustive human reasoning
-
-HiveMind approaches these problems the way evolution and distributed intelligence do: parallel exploration, selective pressure, inheritance of useful behaviors, and continuous coordination.
-
-The result is not just answers, but **maps of the solution space**, showing *why* certain strategies emerge and *how* they interact.
+HiveMind approaches these problems not by asking an LLM for an answer, but by orchestrating an **Autonomous Investigation Cluster** that builds a verifiable structural model of the attack fabric.
 
 ---
 
 ## Core Capabilities
 
-* **Self-expanding agent networks**: Agents can spawn sub-agents when useful.
-* **Hierarchical decision-making**: High-level objectives decompose into lower-level tasks.
-* **Evolutionary learning**: Successful behaviors propagate across generations.
-* **Resource-aware intelligence**: Compute is treated as a scarce, priced resource.
-* **Temporal insight tracking**: All activity is logged into a time-aware knowledge graph.
+* **Recursive LangGraph Orchestration**: Utilizes the LangGraph `Send` API to dynamically spin up execution branches. The system starts at a `Grand Orchestrator`, delegates to specialized `Parent Agents`, and cascades into parallelized `Child Agents` that synthesize highly localized vectors.
+* **Causal Inference Engine**: Bypasses simple LLM assumptions by embedding mathematical causality. Agents design interactive graph networks alongside simulated data, which is subsequently processed by the `DoWhy` library to execute the 4-step structural equation pipeline: **Model, Identify, Estimate, and Refute**.
+* **LLM Graph Hallucination Sanitization**: Built-in state-processing sanitization algorithms automatically patch missing spatial definitions or mapping syntax errors from the LLM, maintaining geometric and mathematical stability.
+* **Interactive Intelligence**: Embedded `streamlit-agraph` integration visually projects the compiled graph in real-time within the browser.
+* **Air-gapped Agnostic Docker Base**: Fully disconnected from local environment package dependencies to eliminate complex multi-array Python math/C-extension library conflicts.
 
 ---
 
-## System Architecture Overview
+## Architectural Data Flow
 
-```
-                ┌────────────────────────┐
-                │   Parent Orchestrator  │
-                │  (Policy Controller)  │
-                └─────────┬─────────────┘
-                          │
-          ┌───────────────┼────────────────┐
-          │               │                │
-   ┌──────▼──────┐  ┌─────▼─────┐  ┌───────▼───────┐
-   │ Child Agent │  │ Child Agent│  │ Child Agent   │
-   │ (Simulator) │  │ (Explorer) │  │ (Synthesizer) │
-   └──────┬──────┘  └─────┬──────┘  └───────┬───────┘
-          │               │                │
-   ┌──────▼────────┐ ┌────▼────────┐ ┌─────▼────────┐
-   │ Sub-Agents     │ │ Sub-Agents   │ │ Sub-Agents   │
-   │ (Specialists)  │ │ (Variants)   │ │ (Analysts)   │
-   └────────────────┘ └──────────────┘ └──────────────┘
-
- Kafka (Async Events) ─────────▶ Temporal Knowledge Graph (Neo4j)
+```mermaid
+graph TD
+    A[Grand Orchestrator] -->|Metacognitive Bounding| B(Parent Agent: Network)
+    A -->|Metacognitive Bounding| C(Parent Agent: Supply Chain)
+    A -->|Metacognitive Bounding| D(Parent Agent: Insider Threat)
+    
+    B --> E[Child Exploit Mapper]
+    B --> F[Child Telemetry Analyser]
+    C --> G[Child Vendor Trust Verifier]
+    
+    E & F & G --> H[Causal Synthesis Node]
+    
+    H -->|Synthesized DF & Graph| I{DoWhy Causal Engine}
+    I -->|Step 1: Model DAG| J[Backdoor Identification]
+    J -->|Step 2: Linear Regression| K[Effect Estimation]
+    K -->|Step 3: Placebo / Random Cause| L[Robustness Refutation]
+    
+    L --> M[Streamlit Agraph Dashboard]
 ```
 
 ---
 
 ## Key Components
 
-This section goes deeper into the concrete mechanisms, control loops, and data flows that make HiveMind work in practice. The goal is not abstraction for its own sake, but enough specificity that an experienced engineer or researcher could reason about failure modes, scaling behavior, and implementation tradeoffs.
+### 1. Hierarchical LangGraph State
+The entire ecosystem rests on typed Pydantic payloads acting as network schemas. Rather than a flat linear pipeline, execution traverses a deeply nested Direct Acyclic Graph (DAG) state capable of carrying isolated analytical memories.
 
-### 1. Parent Orchestrator
+### 2. Metacognitive Threat Analysts
+Instead of generic agents, HiveMind invokes "SOC-Grade" structured metacognition. Agents write `DecisionMemos` actively detailing blind-spots, strategy, and explicit cognitive reasoning to defend their threat assessments.
 
-The Parent Orchestrator is the system’s executive control plane. It operates as a closed-loop controller over the agent population.
-
-**State Inputs**:
-
-* Global objective embedding
-* Active agent graph (lineage, dependencies)
-* Per-agent metrics (reward, cost, entropy, latency)
-* System resource state (GPU, memory, queue depth)
-
-**Actions**:
-
-* Spawn / retire agents
-* Assign or reassign tasks
-* Adjust exploration vs exploitation parameters
-* Approve or deny reproduction requests
-
-The orchestrator is driven by a policy network trained via Hierarchical Reinforcement Learning (HRL).
-
-The reward signal is multi-objective:
-
-R = α · InformationGain − β · ComputeCost − γ · Redundancy + δ · Novelty
-
-This formulation explicitly penalizes wasteful exploration while preserving diversity.
-
----
-
-### 2. Hierarchical Reinforcement Learning
-
-HiveMind models coordination as a semi-Markov Decision Process with temporally extended actions (options).
-
-Options correspond to agent-level and population-level behaviors with learned termination conditions.
-
-This enables long-horizon planning without exploding the action space and improves credit assignment across agent generations.
-
-Training is typically off-policy using experience replay collected from live runs.
-
----
-
-### 3. Child Agents
-
-Each Child Agent is a self-contained execution unit with:
-
-* A local policy (frozen or adaptive)
-* Episodic memory and compressed long-term memory
-* Tool interfaces (LLMs, simulators, search, code execution)
-
-Agents operate under bounded rationality constraints:
-
-* Fixed compute budgets per episode
-* Limited communication bandwidth
-
-Agents emit structured artifacts (hypotheses, plans, evaluation traces) that become first-class objects in the system.
-
----
-
-### 4. Agent Reproduction and Evolution
-
-Agent creation is governed by evolutionary dynamics rather than static templates.
-
-Each agent has a genotype (configuration, prompts, heuristics) and a phenotype (observed behavior).
-
-Evolutionary operators include mutation, crossover, and selection based on rolling fitness windows.
-
-The island model allows populations to explore different local optima before occasional migration, reducing premature convergence.
-
-Evolution proceeds in steady-state rather than discrete generations.
-
----
-
-### 5. Meta-Learning and Federated Updates
-
-Agents share knowledge without centralizing raw data:
-
-* High-performing strategies are distilled into shared representations
-* Updates propagate via federated-style aggregation
-* Prevents collapse into monoculture while preserving useful patterns
-
-This balances diversity with convergence.
-
----
-
-### 6. Compute Economy and Reproduction Control
-
-HiveMind enforces discipline through an explicit internal compute economy.
-
-When an agent proposes spawning a sub-agent, it submits a bid:
-
-Bid = E[ΔInformationGain] / ExpectedComputeCost
-
-Information Gain may be approximated via entropy reduction, novelty in the knowledge graph, or divergence from existing solution clusters.
-
-A global allocator solves a constrained optimization problem each cycle to select which bids are accepted.
-
-This prevents uncontrolled agent growth while preserving high-value exploration.
-
----
-
-### 7. Infrastructure and Orchestration
-
-* **Docker Swarm** manages agent containers
-* GPU and cloud resources are pooled and allocated dynamically
-* Agents can be preempted, paused, or retired
-
-This keeps the system scalable without sacrificing control.
-
----
-
-### 8. Agent Communication
-
-Agents communicate asynchronously via **Kafka**:
-
-* Event-driven, non-blocking messaging
-* Natural fit for large, distributed agent populations
-* Supports replay, auditing, and temporal analysis
-
-All significant events are streamed into downstream systems.
-
----
-
-### 9. Temporally Aware Knowledge Graph
-
-All system events are streamed into a Neo4j-backed temporal knowledge graph.
-
-Nodes represent agents, tasks, artifacts, and decisions. Edges capture lineage, influence, evaluation, and supersession, each with timestamps.
-
-This enables causal tracing, retrospective policy analysis, and detection of convergence or collapse.
-
-The graph is queryable by agents themselves, enabling meta-reasoning over the system’s own history.
-
----
-
-## Use Cases
-
-* Strategic planning and scenario simulation
-* Complex system design and stress testing
-* Market and policy exploration
-* Defense, security, and adversarial modeling
-* Research acceleration and hypothesis discovery
-
-Anywhere the problem space is too large to reason about linearly, HiveMind fits.
+### 3. DoWhy Mathematical Engine
+HiveMind treats the LLM purely as a **Causal Architect**. The LLM constructs structural equations and simulated noise structures. This allows standard Pearlian computational math (via `statsmodels`, `scipy`, and `networkx`) to strip away correlation and isolate pure causal Treatment Effects.
 
 ---
 
 ## How to Run
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
+To bypass all mathematical C-extension library conflicts associated with heavy scientific computing environments, HiveMind has been tightly containerized in Docker.
 
-# Run the application
-streamlit run main.py
+1. First, create your `.env` file at the root:
+```env
+AZURE_OPENAI_ENDPOINT=https://your-endpoint.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-api-key
+AZURE_OPENAI_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_API_VERSION=2024-08-01-preview
 ```
 
-## Design Philosophy
+2. Run the secure cluster:
+```bash
+docker-compose up --build
+```
 
-HiveMind is built around a few core beliefs:
-
-* Intelligence compounds when structured autonomy is allowed
-* Exploration must be constrained by cost
-* Diversity beats premature convergence
-* Insight matters more than raw answers
-
-This is not about replacing human judgment. It is about extending it.
+3. Open your browser to the local visualizer:
+**http://localhost:8501**
 
 ---
 
 ## Status
-
-HiveMind is an active research and engineering project.
-
-Planned next steps:
-
-* Policy network training at scale
-* Information gain estimation improvements
-* Visualization dashboards for agent evolution
-* Domain-specific agent specialization
-
----
-
-## Disclaimer
-
-HiveMind is experimental by design. It prioritizes insight generation over determinism and may produce unexpected behaviors. Resource controls and monitoring are critical for safe operation.
-
----
+HiveMind is an active research and engineering project originally conceived for the advanced systemic bounding of cyber landscapes.
 
 ## License
-
 MIT License
 
 ---
 
 If you are interested in collaborating, extending, or stress-testing HiveMind, open an issue or reach out to Darsh Garg (darsh.garg@gmail.com)
+
+
+Feel free to reach out to the entire team for other inquires at:
+
+Darsh Garg - darsh.garg@gmail.com
+
+Dylan Salber - salbe027@umn.edu
+
+Denial Macellari - denial.macellari@gmail.com

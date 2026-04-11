@@ -1,67 +1,66 @@
 from langgraph.graph import StateGraph, START, END
 from langgraph.constants import Send
-from schema import GraphState, AgentConfig, AgentState
-from agents import generate_memo_node
-from evaluator import evaluate_memos_node
+from schema import GraphState, ParentState, ChildState
+from agents import grand_orchestrator_node, parent_agent_node, child_agent_node
+from causal import causal_synthesis_node, dowhy_engine_node
 
-def orchestrator_node(state: GraphState):
-    """
-    Decides which agents to spawn and issues a Send for each.
-    This acts as the 'Control Plane' in the MVP.
-    """
-    print("-> Orchestrator running: deciding on agents to spawn.")
-    # For the MVP, we statically spawn 3 personas, but this could be LLM-driven
-    agent_configs = [
-        AgentConfig(
-            perspective="Cost-Focused",
-            instructions="Your goal is to minimize expenditure. Focus purely on short-term and long-term cost savings, ROI, and financial prudence."
-        ),
-        AgentConfig(
-            perspective="Risk-Focused",
-            instructions="Your goal is to minimize risk and ensure security/compliance. Prioritize stability and regulatory adherence above all else."
-        ),
-        AgentConfig(
-            perspective="Speed-Focused",
-            instructions="Your goal is speed of execution and time-to-market. Tolerate technical debt or higher costs if it means faster delivery."
-        )
-    ]
-    
-    # We update the state with the configurations we chose
-    return {"agent_configs": agent_configs}
+def route_to_parents(state: GraphState):
+    """Dynamically routes execution to parent agents based on grand orchestrator output."""
+    return [Send("parent_agent", {
+        "task_description": state["task_description"],
+        "persona": config.persona,
+        "focus_objective": config.focus_objective
+    }) for config in state.get("parent_configs", [])]
 
-def spawn_agents(state: GraphState):
-    """
-    Conditional edge function that maps child executions.
-    It returns a list of `Send` objects.
-    """
-    sends = []
-    configs = state.get("agent_configs", [])
-    print(f"-> Spawning {len(configs)} parallel agents.")
-    for config in configs:
-        sends.append(Send("agent_node", {
-            "task_description": state["task_description"],
-            "perspective": config.perspective,
-            "instructions": config.instructions
-        }))
-    return sends
+def gather_children_node(state: GraphState):
+    """Wait step that aligns all dynamically produced child mapping configs."""
+    print(f"-> GATHERING CHILDREN: {len(state.get('child_configs', []))} total child tasks queued.")
+    return {}
 
+def route_to_children(state: GraphState):
+    """Dynamically routes execution to child granular agents."""
+    return [Send("child_agent", {
+        "task_description": state["task_description"],
+        "parent_persona": config.parent_persona,
+        "persona": config.persona,
+        "focus_objective": config.focus_objective
+    }) for config in state.get("child_configs", [])]
+
+def conditional_refutation_check(state: GraphState):
+    """If DoWhy refutation fails, loop back to synthesis."""
+    if state.get("causal_refutation_passed", False) or "error" in state.get("dowhy_results", {}):
+        return "end" # Ends even on systemic math error so we don't inf loop currently
+    else:
+        print("-> [!] Refutation Failed. Retrying Causal Synthesis loop...")
+        return "causal_synthesis"
 
 def build_graph():
     builder = StateGraph(GraphState)
     
-    # Add nodes
-    builder.add_node("orchestrator", orchestrator_node)
-    builder.add_node("agent_node", generate_memo_node)
-    builder.add_node("evaluator", evaluate_memos_node)
+    # 1. Nodes
+    builder.add_node("orchestrator", grand_orchestrator_node)
+    builder.add_node("parent_agent", parent_agent_node)
+    builder.add_node("gather_children", gather_children_node)
+    builder.add_node("child_agent", child_agent_node)
+    builder.add_node("causal_synthesis", causal_synthesis_node)
+    builder.add_node("dowhy_engine", dowhy_engine_node)
     
-    # Add edges
+    # 2. Edges
     builder.add_edge(START, "orchestrator")
+    builder.add_conditional_edges("orchestrator", route_to_parents, ["parent_agent"])
+    builder.add_edge("parent_agent", "gather_children")
+    builder.add_conditional_edges("gather_children", route_to_children, ["child_agent"])
+    builder.add_edge("child_agent", "causal_synthesis")
+    builder.add_edge("causal_synthesis", "dowhy_engine")
     
-    # Dynamic fan-out
-    builder.add_conditional_edges("orchestrator", spawn_agents, ["agent_node"])
-    
-    # Fan-in (reduction)
-    builder.add_edge("agent_node", "evaluator")
-    builder.add_edge("evaluator", END)
+    # 3. Dynamic Cyclic Loop
+    builder.add_conditional_edges(
+        "dowhy_engine",
+        conditional_refutation_check,
+        {
+            "end": END,
+            "causal_synthesis": "causal_synthesis"
+        }
+    )
     
     return builder.compile()
