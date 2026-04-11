@@ -94,3 +94,10 @@ MIT License
 ---
 
 If you are interested in collaborating, extending, or stress-testing HiveMind, open an issue or reach out to Darsh Garg (darsh.garg@gmail.com)
+
+
+Feel free to reach out to the entire team for other inquires at:
+
+Darsh Garg - darsh.garg@gmail.com
+Dylan Salber - salbe027@umn.edu
+Denial Macellari - denial.macellari
