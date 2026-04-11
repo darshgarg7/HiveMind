@@ -1,9 +1,9 @@
-from typing import List, Dict, Any
+from typing import List
 from pydantic import BaseModel, Field
 import os
 from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from schema import GraphState, DecisionMemo
+from schema import GraphState
 
 # Set up LLM
 llm = AzureChatOpenAI(
@@ -11,7 +11,7 @@ llm = AzureChatOpenAI(
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
     azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT", "gpt-4.1"),
     api_version=os.getenv("AZURE_OPENAI_API_VERSION", "2025-01-01-preview"),
-    temperature=0.0
+    temperature=0.4  # Increased from 0.0 to allow for more nuanced, dynamic reasoning
 )
 
 class EvaluationScore(BaseModel):
@@ -31,8 +31,20 @@ class RankedStrategies(BaseModel):
     final_recommendation: str = Field(description="A synthesized final recommendation based on the top strategies")
 
 
+DYNAMIC_EVALUATOR_PROMPT = """You are an adaptive, expert evaluator.
+
+ORIGINAL TASK:
+{task_description}
+
+INSTRUCTIONS:
+1. Dynamically Analyze Task: First, analyze the original task to determine its implicit priorities. Does the situation demand speed? Is cost the absolute bottleneck? Or is risk containment paramount?
+2. Adaptive Scoring: You must score these memos based on how well they align with the *specific priorities you identified* for this exact task—do NOT default to prioritizing risk unless the task explicitly warrants it.
+3. Ranking: Rank the perspectives based on your adaptive scoring.
+
+You will receive several decision memos from different perspectives below. Evaluate each, score them, rank them, and provide a final recommendation that perfectly aligns with the nuances of the original task."""
+
 evaluator_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are an expert evaluator. The original task was:\n{task_description}\n\nYou will receive several decision memos from different perspectives. Evaluate each, score them, rank them, and provide a final recommendation."),
+    ("system", DYNAMIC_EVALUATOR_PROMPT),
     ("user", "Memos:\n{memos_text}")
 ])
 
