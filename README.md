@@ -99,5 +99,7 @@ If you are interested in collaborating, extending, or stress-testing HiveMind, o
 Feel free to reach out to the entire team for other inquires at:
 
 Darsh Garg - darsh.garg@gmail.com
+
 Dylan Salber - salbe027@umn.edu
-Denial Macellari - denial.macellari
+
+Denial Macellari - denial.macellari@gmail.com
