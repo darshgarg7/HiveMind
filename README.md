@@ -79,9 +79,31 @@ AZURE_OPENAI_API_VERSION=2024-08-01-preview
 ```bash
 docker-compose up --build
 ```
+(Note: The first time you run this, it may take a while to download the base image and dependencies.)
 
-3. Open your browser to the local visualizer:
-**http://localhost:8501**
+(Note: --remove-orphans is used to remove any orphaned containers. So you can run: docker-compose up --build --remove-orphans  ,if ran more than once to start the cluster without any orphaned containers.)
+
+Then access:
+- Beautiful UI (Frontend): http://localhost:8080
+- API Backend: http://localhost:8000
+
+(Note: If you get a "port already in use" error, you can change the ports in the `docker-compose.yml` file.)
+
+## API Usage
+
+POST `/run`
+
+```json
+{
+  "task_description": "..."
+}
+```
+
+Returns structured strategies, causal graph, and impact metrics.
+
+## Notes
+- The Frontend runs the Lovable React app.
+- The API is the Python engine running the DoWhy and LangGraph logic.
 
 ---
 
