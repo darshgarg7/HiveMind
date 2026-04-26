@@ -44,6 +44,8 @@ export const CausalGraphClient = forwardRef<CausalGraphHandle, CausalGraphProps>
   const [showLabels, setShowLabels] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
 
+  const graphStr = JSON.stringify(graph);
+  
   // Build node + link arrays with degree info
   const data = useMemo(() => {
     const nodes: GNode[] = graph.nodes.map((n) => ({ ...n, __indeg: 0, __outdeg: 0 }));
@@ -57,7 +59,8 @@ export const CausalGraphClient = forwardRef<CausalGraphHandle, CausalGraphProps>
       nodeMap.get(e.target)!.__indeg!++;
     }
     return { nodes, links };
-  }, [graph]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [graphStr]);
 
   // Annotation lookup
   const annByKey = useMemo(() => {
@@ -96,9 +99,16 @@ export const CausalGraphClient = forwardRef<CausalGraphHandle, CausalGraphProps>
   useEffect(() => {
     if (!containerRef.current) return;
     const el = containerRef.current;
-    const ro = new ResizeObserver(() => {
-      const r = el.getBoundingClientRect();
-      setSize({ w: Math.max(320, r.width), h: r.height || height });
+    const ro = new ResizeObserver((entries) => {
+      const r = entries[0].contentRect;
+      setSize((prev) => {
+        const nextW = Math.max(320, Math.floor(r.width));
+        const nextH = Math.floor(r.height || height);
+        if (Math.abs(prev.w - nextW) > 2 || Math.abs(prev.h - nextH) > 2) {
+          return { w: nextW, h: nextH };
+        }
+        return prev;
+      });
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -108,10 +118,11 @@ export const CausalGraphClient = forwardRef<CausalGraphHandle, CausalGraphProps>
     fgRef.current?.zoomToFit(400, 40);
   }, []);
 
+  const graphHash = `${graph.nodes.length}-${graph.edges.length}`;
   useEffect(() => {
     const t = setTimeout(fit, 200);
     return () => clearTimeout(t);
-  }, [data, fit]);
+  }, [graphHash, fit]);
 
   useImperativeHandle(ref, () => ({
     getCanvas: () => {

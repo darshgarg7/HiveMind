@@ -175,7 +175,19 @@ export function ExecutiveView({ fields, ttps, result, derived, observability }: 
           <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-[color:var(--neon-cyan)]">
             Recommended Action
           </div>
-          <p className="mb-3 text-sm leading-relaxed text-foreground">{recommendedAction}</p>
+          <div className="mb-3 space-y-2">
+            {recommendedAction.split('. ')
+              .filter(s => s.trim().length > 0)
+              .map((sentence, idx) => {
+                const text = sentence.trim().endsWith('.') ? sentence : sentence + '.';
+                return (
+                  <div key={idx} className="flex items-start gap-2 text-sm leading-relaxed text-foreground">
+                    <span className="text-[color:var(--neon-cyan)] select-none mt-0.5">•</span>
+                    <span>{text}</span>
+                  </div>
+                );
+              })}
+          </div>
           {result && (
             <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
               <span>Run {result.run_id}</span>

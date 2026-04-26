@@ -85,7 +85,7 @@ export const CausalGraphPanel = forwardRef<CausalGraphHandle, CausalGraphPanelPr
 
       {view === "graph" ? (
         <div className="grid gap-px bg-white/5 lg:grid-cols-[1fr_280px]">
-          <div className="bg-[oklch(0.16_0.03_260/0.6)] p-3">
+          <div className="min-w-0 bg-[oklch(0.16_0.03_260/0.6)] p-3">
             <CausalGraphViz
               ref={ref}
               graph={graph}
