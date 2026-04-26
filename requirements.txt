@@ -12,3 +12,5 @@ networkx
 streamlit-agraph
 scipy
 scikit-learn
+fastapi
+uvicorn

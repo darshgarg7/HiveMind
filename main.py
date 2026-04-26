@@ -7,7 +7,7 @@ from streamlit_agraph import agraph, Node, Edge, Config
 
 load_dotenv()
 
-from graph import build_graph
+from engine import run_hivemind
 
 def main():
     st.set_page_config(page_title="HiveMind Causal Engine", page_icon="🕸️", layout="wide")
@@ -34,65 +34,32 @@ def main():
             return
 
         with st.status("Executing Hierarchical Agentic Loop...", expanded=True) as status:
-            st.write("1. Compiling Graph...")
-            graph = build_graph()
-
-            initial_state = {
-                "task_description": task_description,
-                "parent_configs": [],
-                "child_configs": [],
-                "memos": [],
-                "causal_payload": None,
-                "dowhy_results": None,
-                "causal_refutation_passed": False
-            }
-
-            st.write("2. Invoking Grand Orchestrator Loop...")
+            st.write("Executing Causal Graph Loop...")
             try:
-                final_state = graph.invoke(initial_state)
+                artifact = run_hivemind(task_description)
                 status.update(label="Analysis & Causal Inference Complete", state="complete", expanded=False)
             except Exception as e:
                 status.update(label="Execution Failed", state="error", expanded=False)
                 st.error(f"Error executing graph: {str(e)}")
                 return
 
-        # Save artifacts
-        run_id = f"run-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
-        os.makedirs("data", exist_ok=True)
-
-        def serialize_pydantic(obj):
-            if hasattr(obj, "model_dump"):
-                return obj.model_dump()
-            return obj
-
-        artifact = {
-            "run_id": run_id,
-            "memos": [serialize_pydantic(m) for m in final_state.get("memos", [])],
-            "causal_payload": final_state.get("causal_payload"),
-            "dowhy_results": final_state.get("dowhy_results")
-        }
-        
-        artifact_path = f"data/{run_id}.json"
-        with open(artifact_path, "w") as f:
-            json.dump(artifact, f, indent=2)
-
+        artifact_path = f"data/{artifact['run_id']}.json"
         st.success(f"Execution trace saved locally to `{artifact_path}`")
         st.divider()
 
         # UI LAYOUT
         col1, col2 = st.columns([1, 1])
 
-        payload = final_state.get("causal_payload")
-        dowhy_res = final_state.get("dowhy_results")
+        causal_graph = artifact.get("causal_graph", {})
+        impact = artifact.get("impact", {})
 
         with col1:
             st.subheader("Synthesized Causal DAG (interactable)")
-            if payload and "graph" in payload:
+            if causal_graph and "nodes" in causal_graph:
                 nodes = []
                 edges = []
-                g_def = payload["graph"]
                 
-                for n in g_def.get("nodes", []):
+                for n in causal_graph.get("nodes", []):
                     nodes.append(Node(
                         id=n["id"], 
                         label=n["label"], 
@@ -101,7 +68,7 @@ def main():
                         title=n.get("description", "")
                     ))
                     
-                for e in g_def.get("edges", []):
+                for e in causal_graph.get("edges", []):
                     edges.append(Edge(
                         source=e["source"], 
                         target=e["target"],
@@ -115,24 +82,15 @@ def main():
 
         with col2:
             st.subheader("DoWhy Causal Estimation")
-            if dowhy_res:
-                if "error" in dowhy_res:
-                    st.error(f"Mathematical engine failed: {dowhy_res['error']}")
+            if impact:
+                ate = impact.get("ate", 0.0)
+                st.metric("Average Treatment Effect (ATE)", f"{ate:.4f}")
+                
+                confidence = impact.get("confidence", "low")
+                if confidence == "high":
+                    st.success("Refutation Tests Passed (Robust Causal Logic verified via subsets/placebos)")
                 else:
-                    try:
-                        ate = float(dowhy_res.get('ate_estimate', 0))
-                        st.metric("Average Treatment Effect (ATE)", f"{ate:.4f}")
-                    except:
-                        st.metric("Average Treatment Effect (ATE)", str(dowhy_res.get('ate_estimate')))
-                    
-                    passed = dowhy_res.get("refutation_passed", False)
-                    if passed:
-                        st.success("Refutation Tests Passed (Robust Causal Logic verified via subsets/placebos)")
-                    else:
-                        st.error("Refutation Tests Failed (Fragile Causal Logic, DAG is weak)")
-                        
-                    with st.expander("View Full DoWhy Refutation Metrics"):
-                        st.text(dowhy_res.get("refutation_details", ""))
+                    st.error("Refutation Tests Failed (Fragile Causal Logic, DAG is weak)")
             else:
                 st.write("No DoWhy metrics returned.")
                 
