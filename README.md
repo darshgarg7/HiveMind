@@ -84,22 +84,10 @@ docker-compose up --build
 (Note: --remove-orphans is used to remove any orphaned containers. So you can run: docker-compose up --build --remove-orphans  ,if ran more than once to start the cluster without any orphaned containers.)
 
 Then access:
-- Beautiful UI (Frontend): http://localhost:8080
-- API Backend: http://localhost:8000
+- Application: http://localhost:8080
+- API Backend for testing: http://localhost:8000
 
 (Note: If you get a "port already in use" error, you can change the ports in the `docker-compose.yml` file.)
-
-## API Usage
-
-POST `/run`
-
-```json
-{
-  "task_description": "..."
-}
-```
-
-Returns structured strategies, causal graph, and impact metrics.
 
 ## Notes
 - The Frontend runs the Lovable React app.
